@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: "Roboto", serif;
+            background: linear-gradient(45deg, #240165 , #05001c);
+            height: 100vh;
+            color: white;
+        } 
+        #city-name {
+            color: #fff;
+            font-size: 100px;
+            margin-left: 20px;
+            margin-top: 40px;
+            margin-bottom:0 ;
+        }
+        h6 {
+            font-size: 40px;
+            margin: 10px 30px ;
+            font-weight: 300;
+        }
+        .heading {
+            position: relative;
+        }
+        .heading::after {
+            content: "";
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            width: 800px;
+            height: 1px;
+            background-color: #310085;
+        }
+
+        .cards{
+            margin-top: 100px;
+            height: 200px;
+            /* margin-left: 20px; */
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+        .card {
+        width: 12%;
+        height: 95%;
+        background-color: white;
+        font-size: 20px;
+        box-shadow: 0px 10px 5px rgb(0 0 0 / 30%);
+        border-radius: 5px;
+        }
+        .card h2 {
+            background: linear-gradient(45deg,#5709ee , #7a37bf);
+            color: white;
+            padding: 10px 5px;
+            text-align: center;
+            font-weight: 400;
+            margin-bottom: 0;
+            margin-top: 0;
+            border-radius: 5px 5px 0 0;
+        }
+        .body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: black;
+            height: calc(100% - 56px);
+        }
+        .body h3 {
+            font-size: 40px;
+        }
+        .select-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 120px;
+        }
+        .select-box select {
+            width: 300px;
+            height: 45px;
+            font-size:25px;
+            padding: 8px;
+            border-radius: 5px;
+            background-color :transparent;
+            color: white;
+        }
+        select option {
+            background-color: white ;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div>
+            <div class="heading">
+                <h1 id="city-name">Cairo</h1>
+                <h6 id="date"> Friday 15 February </h6>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <h2>Fajr</h2>
+                    <div class="body">
+                        <h3 id="fajr-time">4:30</h3>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>Sunrise </h2>
+                    <div class="body">
+                        <h3 id="sunrise-time">4:30</h3>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>Dhuhr</h2>
+                    <div class="body">
+                        <h3 id="dhuhr-time">4:30</h3>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>Asr</h2>
+                    <div class="body">
+                        <h3 id="asr-time">4:30</h3>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>Maghrib</h2>
+                    <div class="body">
+                        <h3 id="maghrib-time">4:30</h3>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>Isha</h2>
+                    <div class="body">
+                        <h3 id="isha-time">4:30</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="select-box">
+                <select id="cities-select">
+                    
+                </select>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="node_modules/axios/dist/axios.min.js"></script>
+<script>
+    let cities = [
+        {
+            name: "Cairo",
+            keyName: "Al Qāhirah"
+        },
+        {
+            name: "Alexandria",
+            keyName: "Al Iskandarīyah"
+        },
+        {
+            name: "El behira",
+            keyName: "Al Buḩayrah"
+        },
+        {
+            name: "Kafr elsheikh",
+            keyName: "Kafr ash Shaykh"
+        },
+        {
+            name: "Luxor",
+            keyName: "Al Uqşur"
+        },
+        {
+            name: "Damietta",
+            keyName: "Damietta"
+        },
+        {
+            name: "North Sinai",
+            keyName: "Shamāl Sīnā'"
+        },
+        {
+            name: "Sohag",
+            keyName: "Sūhāj"
+        }
+    ]
+    for(let city of cities) {
+        const content = `
+        <option>${city.name}</option>
+        `
+        document.getElementById('cities-select').innerHTML += content;
+    }
+    document.getElementById('cities-select').addEventListener('change', function() {
+        document.getElementById("city-name").innerHTML = this.value
+        let cityName = ""
+        for(city of cities) {
+            if(city.name == this.value){
+                cityName = city.keyName
+            }
+        }
+        getPrayerTimingsOfCity(cityName)
+    })
+
+
+    function getPrayerTimingsOfCity(cityName){
+
+        let params = {
+        country: "EG",
+        city: cityName //"Al Buḩayrah"
+    }
+    axios.get('http://api.aladhan.com/v1/timingsByCity', {
+        params: params
+    })
+    .then(function (response) {
+        const timings = response.data.data.timings;
+        fillTimeForPrayer('fajr-time', timings.Fajr);
+        fillTimeForPrayer('sunrise-time', timings.Sunrise);
+        fillTimeForPrayer('dhuhr-time', timings.Dhuhr);
+        fillTimeForPrayer('asr-time', timings.Asr);
+        fillTimeForPrayer('maghrib-time', timings.Sunset);
+        fillTimeForPrayer('isha-time', timings.Isha);
+
+        const readableDate = response.data.data.date.readable
+        const weekDay = response.data.data.date.hijri.weekday.en
+        const date = weekDay + " " + readableDate 
+        document.getElementById('date').innerText = date
+    })
+    .catch(function (error) {
+        console.log(error);
+    })
+    }
+
+    getPrayerTimingsOfCity("Al Buḩayrah")
+
+
+    function fillTimeForPrayer(id, time) {
+        document.getElementById(id).innerText = time;
+    }
+</script>
+</html>
